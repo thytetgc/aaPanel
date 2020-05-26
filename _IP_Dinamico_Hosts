@@ -11,8 +11,8 @@ DOMINIO=DOMINIO.com.br
 for IPANTIGO in ${IPDINAMICO}; do
 #iptables -D INPUT -s ${IPANTIGO} -p udp -m udp --dport 1:65535 -j ACCEPT
 #iptables -D INPUT -s ${IPANTIGO} -p tcp -m tcp --dport 1:65535 -j ACCEPT
-iptables -D IN_public_allow -s ${IP} -p udp -m udp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
-iptables -D IN_public_allow -s ${IP} -p tcp -m tcp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
+iptables -D IN_public_allow -s ${IPANTIGO} -p udp -m udp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
+iptables -D IN_public_allow -s ${IPANTIGO} -p tcp -m tcp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
 done
 
 # Variavel IP recebe o retorno do dig
