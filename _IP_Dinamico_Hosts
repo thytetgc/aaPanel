@@ -1,0 +1,42 @@
+#!/bin/bash
+clear
+touch /etc/.hostsip
+
+# Obter o IP de um domínio
+IPHOSTS=/etc/hosts
+IPDINAMICO=`cat /etc/.hostsip`
+DOMINIO=DOMINIO.com.br
+
+#Remove do IPTables
+for IPANTIGO in ${IPDINAMICO}; do
+#iptables -D INPUT -s ${IPANTIGO} -p udp -m udp --dport 1:65535 -j ACCEPT
+#iptables -D INPUT -s ${IPANTIGO} -p tcp -m tcp --dport 1:65535 -j ACCEPT
+iptables -D IN_public_allow -s ${IP} -p udp -m udp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
+iptables -D IN_public_allow -s ${IP} -p tcp -m tcp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
+done
+
+# Variavel IP recebe o retorno do dig
+IP=$(dig +short ${DOMINIO} @8.8.8.8)
+
+# Testa se variável IP não esta vazia
+if [ -z "${IP}" ]; then
+
+#Se for nula, avisa o usuario que algo esta errado
+        echo -e "O endereço informado: ${DOMINIO} não existe ou esta incorreto! \n "
+else
+
+#Não sendo nula, grava o IP no hosts
+        sed -i '/'${DOMINIO}'/d' ${IPHOSTS}
+        echo "${IP}     ${DOMINIO}" >> ${IPHOSTS}
+        echo "${IP}" > /etc/.hostsip
+
+#Imprime o valor do IP da tela
+#        echo -e "O IP desse site é: \n  ${IP} \n"
+
+#Adiciona ao IPTables
+#iptables -A INPUT -s ${IP} -p udp -m udp --dport 1:65535 -j ACCEPT
+#iptables -A INPUT -s ${IP} -p tcp -m tcp --dport 1:65535 -j ACCEPT
+iptables -A IN_public_allow -s ${IP} -p udp -m udp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
+iptables -A IN_public_allow -s ${IP} -p tcp -m tcp --dport 1:65535 -m conntrack --ctstate NEW,UNTRACKED -j ACCEPT
+
+fi
