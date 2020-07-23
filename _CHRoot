@@ -22,7 +22,7 @@ Principal() {
      echo "+-------------------------------------------------+"
      echo "|           Utilitario para aaPanel               |"
      echo "+-------------------------------------------------+"
-     echo "| Usuarios ssh enjaulados                 v1.10   |"
+     echo "| Usuarios ssh enjaulados                 v1.11   |"
      echo "+-------------------------------------------------+"
      echo "| Escrito por:                                    |"
      echo "| Thiago Castro - www.hostlp.cloud                |"
@@ -124,6 +124,7 @@ mount -a
 echo
 echo "Dando as permissões de uso para pasta do aaPanel..."
 chown ${NEW_USER_NAME}:${NEW_GROUP_NAME} ${HOME_DIR}/${NEW_USER_NAME}${HOME_AAP}/${DOMAIN} -R
+chmod 775 ${HOME_DIR}/${NEW_USER_NAME}${HOME_AAP}/${DOMAIN} -R
 ln -s ${HOME_AAP}/${DOMAIN} ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}
 export NEW_WEB_ID=$(id -u ${USER_WEB})
 export NEW_WEB_GROUP_ID=$(id -g ${GROUP_WEB})
