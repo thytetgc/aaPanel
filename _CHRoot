@@ -22,7 +22,7 @@ Principal() {
      echo "+-------------------------------------------------+"
      echo "|           Utilitario para aaPanel               |"
      echo "+-------------------------------------------------+"
-     echo "| Usuarios ssh enjaulados                 v1.11   |"
+     echo "| Usuarios ssh enjaulados                 v1.14   |"
      echo "+-------------------------------------------------+"
      echo "| Escrito por:                                    |"
      echo "| Thiago Castro - www.hostlp.cloud                |"
@@ -96,12 +96,12 @@ systemctl restart sshd
 echo
 echo "Adicionando Usuario..."
 useradd ${NEW_USER_NAME} 2>/dev/null
-usermod -G www,${NEW_GROUP_NAME} -d ${HOME_DIR}/${NEW_USER_NAME} ${NEW_USER_NAME}
+usermod -aG www,${NEW_GROUP_NAME} -d ${HOME_DIR}/${NEW_USER_NAME} ${NEW_USER_NAME}
 mkdir -p ${HOME_DIR}/${NEW_USER_NAME}${HOME_AAP}/${DOMAIN}
 	echo "+-------------------------------------------------+OK"
 
 echo
-echo "Digite a senha para o usuario --> "${NEW_USER_NAME}" <--"
+echo "Digite uma senha...<--"
 passwd ${NEW_USER_NAME}
 	echo "+-------------------------------------------------+OK"
 
@@ -123,21 +123,22 @@ mount -a
 
 echo
 echo "Dando as permissões de uso para pasta do aaPanel..."
-chown ${NEW_USER_NAME}:${NEW_GROUP_NAME} ${HOME_DIR}/${NEW_USER_NAME}${HOME_AAP}/${DOMAIN} -R
-chmod 775 ${HOME_DIR}/${NEW_USER_NAME}${HOME_AAP}/${DOMAIN} -R
-ln -s ${HOME_AAP}/${DOMAIN} ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}
+chown ${NEW_USER_NAME}:${NEW_GROUP_NAME} ${HOME_DIR}/${NEW_USER_NAME}${HOME_AAP}/${DOMAIN} -R 2>/dev/null
+chmod 775 ${HOME_DIR}/${NEW_USER_NAME}${HOME_AAP}/${DOMAIN} -R 2>/dev/null
 export NEW_WEB_ID=$(id -u ${USER_WEB})
 export NEW_WEB_GROUP_ID=$(id -g ${GROUP_WEB})
-chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'useradd -u '${NEW_WEB_ID}' '${USER_WEB}''
-chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'groupadd -g '${NEW_WEB_GROUP_ID}' '${GROUP_WEB}''
+chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'useradd -u '${NEW_WEB_ID}' '${USER_WEB}' -s/sbin/nologin' 2>/dev/null
+chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'groupadd -g '${NEW_WEB_GROUP_ID}' '${GROUP_WEB}'' 2>/dev/null
 	echo "+-------------------------------------------------+OK"
 
 echo
 echo "Enjaulando usuario..."
 export NEW_USER_ID=$(id -u ${NEW_USER_NAME})
 export NEW_USER_GROUP_ID=$(id -g ${NEW_GROUP_NAME})
-chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'useradd -u '${NEW_USER_ID}' '${NEW_USER_NAME}''
-chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'groupadd -g '${NEW_USER_GROUP_ID}' '${NEW_GROUP_NAME}''
+chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'useradd -u '${NEW_USER_ID}' '${NEW_USER_NAME}'' 2>/dev/null
+chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'groupadd -g '${NEW_USER_GROUP_ID}' '${NEW_GROUP_NAME}'' 2>/dev/null
+chroot ${HOME_DIR}/${NEW_USER_NAME} /bin/bash -c 'usermod -aG '${GROUP_WEB}' '${NEW_USER_NAME}'' 2>/dev/null
+ln -s ${HOME_AAP}/${DOMAIN} ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}
 	echo "+-------------------------------------------------+OK"
 
 echo
@@ -153,9 +154,12 @@ wget --no-check-certificate --no-cache --no-cookies -N https://raw.githubusercon
 	echo "+-------------------------------------------------+OK"
 
 	echo
-	echo "Usuario --> "${NEW_USER_NAME}" <-- enjaulado"
+	echo "Usuario --> "${NEW_USER_NAME}""
+	echo "Grupo   --> "${NEW_GROUP_NAME}""
+	echo 
+	echo "CRIADOS"
 	echo "+-------------------------------------------------+OK"
-
+	
 	echo
     echo "Pressione qualquer tecla para continuar..."
     read msg
