@@ -22,7 +22,7 @@ Principal() {
      echo "+-------------------------------------------------+"
      echo "|           Utilitario para aaPanel               |"
      echo "+-------------------------------------------------+"
-     echo "| Usuarios ssh enjaulados                 v1.15   |"
+     echo "| Usuarios ssh enjaulados                 v1.19   |"
      echo "+-------------------------------------------------+"
      echo "| Escrito por:                                    |"
      echo "| Thiago Castro - www.hostlp.cloud                |"
@@ -71,7 +71,7 @@ cu() {
 
 	echo -n "Digite o nome de usuario...: "
 	read NEW_USER_NAME
-	echo -n "Digite o dominio...........: "
+	echo -n "Digite o site/dominio......: "
 	read DOMAIN
 	
 export NEW_GROUP_NAME=${NEW_USER_NAME}
@@ -86,6 +86,7 @@ echo "Configurando o SSH..."
 echo "" >> /etc/ssh/sshd_config
 echo "Match Group ${NEW_GROUP_NAME}" >> /etc/ssh/sshd_config
 echo "   ChrootDirectory ${HOME_DIR}/${NEW_USER_NAME}" >> /etc/ssh/sshd_config
+echo "   AuthorizedKeysFile ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}/.ssh/authorized_keys" >> /etc/ssh/sshd_config
 	echo "+-------------------------------------------------+OK"
 
 echo
@@ -143,6 +144,17 @@ ln -s ${HOME_AAP}/${DOMAIN} ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_N
 	echo "+-------------------------------------------------+OK"
 
 echo
+echo "Configurando o SSH KEY..."
+mkdir ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}/.ssh/
+ssh-keygen -f ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}/.ssh/id_rsa -t ed25519 -C ${NEW_USER_NAME}@`hostname --fqdn`
+cp -rf ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}/.ssh/id_rsa.pub ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}/.ssh/authorized_keys
+chown ${NEW_USER_NAME}:${NEW_USER_NAME} -R ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}/.ssh/
+echo
+cat ${HOME_DIR}/${NEW_USER_NAME}${HOME_DIR}/${NEW_USER_NAME}/.ssh/id_rsa
+echo
+	echo "+-------------------------------------------------+OK"
+
+echo
 echo "Adicionando DNS para o usuario..."
 echo "nameserver 1.1.1.1" >> ${HOME_DIR}/${NEW_USER_NAME}/etc/resolv.conf
 echo "nameserver 8.8.8.8" >> ${HOME_DIR}/${NEW_USER_NAME}/etc/resolv.conf
@@ -173,7 +185,7 @@ ru() {
 
 	echo -n "Digite o nome de usuario...: "
 	read NEW_USER_NAME
-	echo -n "Digite o dominio...........: "
+	echo -n "Digite o site/dominio......: "
 	read DOMAIN
 	
 NEW_GROUP_NAME=${NEW_USER_NAME}
